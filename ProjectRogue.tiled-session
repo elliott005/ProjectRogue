@@ -1,0 +1,68 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "maps/src/map_0.tmx",
+    "expandedProjectPaths": [
+        "tilesets",
+        ".",
+        "maps/src",
+        "maps"
+    ],
+    "fileStates": {
+        "maps/src/map_0.tmx": {
+            "expandedObjectLayers": [
+                6,
+                7
+            ],
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 333,
+                "y": 257
+            }
+        },
+        "maps/src/map_1.tmx": {
+            "expandedObjectLayers": [
+                4,
+                3
+            ],
+            "scale": 0.598203125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 320.12537547342305,
+                "y": 320.125375473423
+            }
+        },
+        "maps/src/map_2.tmx": {
+            "scale": 0.598203125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 320.12537547342305,
+                "y": 320.125375473423
+            }
+        },
+        "tilesets/Woods.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/ellio/Documents/coding/lua/ProjectRogue/maps/exports",
+    "last.imagePath": "C:/Users/ellio/Documents/coding/lua/ProjectRogue/assets/Tiles",
+    "map.lastUsedExportFilter": "Lua files (*.lua)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 20,
+    "openFiles": [
+        "maps/src/map_0.tmx",
+        "maps/src/map_1.tmx",
+        "tilesets/Woods.tsx"
+    ],
+    "project": "ProjectRogue.tiled-project",
+    "recentFiles": [
+        "tilesets/Woods.tsx",
+        "maps/src/map_1.tmx",
+        "maps/src/map_0.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}
