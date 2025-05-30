@@ -28,21 +28,43 @@ function Game:load()
         end
         map:init(neighbors)
     end
+
+    self.mobs = {
+        enemy_types.boar(100, 0)
+    }
 end
 
 function Game:update(dt)
     for i, map in ipairs(self.maps) do
         map:update(dt)
     end
+    
+    local width, height, flags = love.window.getMode()
+    for i, mob in ipairs(self.mobs) do
+        if math.abs(mob.position.x - self.player.position.x) <= width then
+            mob:update(dt, self.maps, self.player.position)
+        end
+    end
+    
     self.player:update(dt, self.joystick, self.maps)
 end
 
 function Game:draw()
     self.background:draw(self.player.position)
+    
     self.player:updateCamera()
+    
     for i, map in ipairs(self.maps) do
         map:draw()
     end
+    
+    local width, height, flags = love.window.getMode()
+    for i, mob in ipairs(self.mobs) do
+        if math.abs(mob.position.x - self.player.position.x) <= width then
+            mob:draw()
+        end
+    end
+
     self.player:draw()
 
     love.graphics.origin()

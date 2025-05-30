@@ -56,7 +56,7 @@ function Player:new(x, y)
 end
 
 function Player:update(dt, joystick, maps)
-    tilemaps = {}
+    local tilemaps = {}
     for i = math.floor((self.position.x - maps[1].position.x * Globals.tile_size) / Globals.tilemap_size_pixels.x) + 1,
     math.ceil((self.position.x + self.collision_size.x) / Globals.tilemap_size_pixels.x) - maps[1].position.x / Globals.tilemap_size.x + 1 do
         if i > 0 and i <= #maps then
@@ -212,15 +212,15 @@ function Player:check_collision_x(dt, tilemaps)
     end
     collided = false
     if self.velocity.x ~= 0 then
+        offset = 0
+        if self.velocity.x > 0 then
+            offset = self.collision_size.x
+        end
         rect = {
             pos = self.position,
-            size = vector(self.collision_size.x + self.velocity.x * dt, self.collision_size.y)
+            size = vector(offset + self.velocity.x * dt, self.collision_size.y)
         }
-        offset = 0
-        if self.velocity.x < 0 then
-            offset = -Globals.tile_size / 2
-        end
-        for x = math.floor(rect.pos.x / Globals.tile_size) + 1, math.ceil((rect.pos.x + offset + rect.size.x) / Globals.tile_size), lume.sign(self.velocity.x) do
+        for x = math.floor((rect.pos.x) / Globals.tile_size) + 1, math.floor((rect.pos.x + rect.size.x) / Globals.tile_size) + 1, lume.sign(self.velocity.x) do
             local current_map = tilemaps[1].tilemap
             local map_x = x - tilemaps[1].position.x
             --print(temp_x, tilemaps[1].position.x + Globals.tilemap_size.x)

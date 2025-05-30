@@ -10,6 +10,7 @@ require "src/game/Background"
 inputs = require "src/game/Inputs"
 require "src/game/Tiles"
 require "src/player/Player"
+require "src/enemies/EnemyBase"
 
 function love.load()
     current_state = Game()

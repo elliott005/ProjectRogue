@@ -13,11 +13,13 @@ Inputs.right = {
 }
 
 Inputs.jump = {
-    keyboard = {"space", "w"}
+    keyboard = {"space", "w"},
+    gamepad = {"a"}
 }
 
 Inputs.attack = {
-    keyboard = {"d"}
+    keyboard = {"d"},
+    gamepad = {"b"}
 }
 
 function Inputs:checkInput(input, joystick)
