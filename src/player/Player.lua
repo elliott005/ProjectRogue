@@ -4,6 +4,27 @@ function Player:new(x, y)
     self.position = vector(x, y)
     self.collision_size = vector(16, 45)
 
+    -- attack variables
+    self.attacking = false
+    self.attack_hitbox = {active = false, position = vector(0, 0), size = vector(1, 1)}
+    local attack_frames_human = {
+        ["attack_slash"] = {
+            ["1-2"] = {active = false, position = vector(16, 0), size = vector(30, 45)},
+            ["3-6"] = {active = true, position = vector(16, 0), size = vector(30, 45)},
+        }
+    }
+    self.attack_frames = {}
+    for k, attack in pairs(attack_frames_human) do
+        local new_frames = {}
+        for interval, frame in pairs(attack) do
+            mini, maxi, stepi = self:parseInterval(interval)
+            for i = mini, maxi, stepi do
+                new_frames[i] = frame
+            end
+        end
+        self.attack_frames[k] = new_frames
+    end
+    
     -- movement variables
     self.velocity = vector(0, 0)
     self.max_speed = vector(150, 256)
@@ -16,6 +37,7 @@ function Player:new(x, y)
     self.jump_speed = -250
     self.coyote_time = 0.2
     self.coyote_timer = 0.0
+    self.movement_locked = false
 
     -- drawing variables
     self.draw_offset = vector(57, 18)
@@ -26,6 +48,7 @@ function Player:new(x, y)
     self:loadAnim("run", "assets/SL_character/Run.png", self.frame_width, self.frame_height, 0.1, {"1-2", "1-4"})
     self:loadAnim("jump_up", "assets/SL_character/Jump.png", self.frame_width, self.frame_height, 0.2, {"1-2", "1-2"})
     self:loadAnim("jump_end", "assets/SL_character/Jump.png", self.frame_width, self.frame_height, 0.2, {1, 3})
+    self:loadAnim("attack_slash", "assets/SL_character/Attacks.png", self.frame_width, self.frame_height, 0.15, {"1-6", 1})
     self.current_animation = "idle"
     self.facingRight = false
     self.camera_position = vector(0, 0)
@@ -42,6 +65,7 @@ function Player:update(dt, joystick, maps)
     end
     
     -- movement
+    self.movement_locked = self.attacking
     local was_grounded = self.grounded
     self:move(dt, joystick, tilemaps)
     if self.coyote_timer > 0.0 then
@@ -52,6 +76,12 @@ function Player:update(dt, joystick, maps)
     end
     if was_grounded and not self.grounded and self.velocity.y > 0.0 then
         self.coyote_timer = dt
+    end
+
+    if inputs:checkInput(inputs.attack, joystick) > 0 then
+        if not self.attacking then
+            self.attacking = true
+        end
     end
 
     -- update animations
@@ -79,11 +109,23 @@ function Player:update(dt, joystick, maps)
             self.current_animation = "jump_end"
         end        
     end
+    if self.attacking then
+        self.current_animation = "attack_slash"
+        self:update_attack_hitbox()
+    else
+        self.attack_hitbox.active = false
+        self.animations["attack_slash"]["anim"]:gotoFrame(1)
+    end
 
     self.animations[self.current_animation]["anim"]:update(anim_speed)
-    if self.current_animation == "jump_up" and self.animations[self.current_animation]["anim"].loop_ended then
-        self.current_animation = "idle"
-        self.jump_animation_finished = true
+    if self.animations[self.current_animation]["anim"].loop_ended then
+        if self.current_animation == "jump_up" then
+            self.current_animation = "idle"
+            self.jump_animation_finished = true
+        elseif self.current_animation == "attack_slash" then
+            self.current_animation = "idle"
+            self.attacking = false
+        end
     end
 
     -- update camera
@@ -106,6 +148,12 @@ function Player:draw()
         0,
         self.facingRight and 1 or -1, 1
     )
+
+    if not self.attack_hitbox.active then
+        love.graphics.setColor(1, 1, 1, 0.5)
+    end
+    love.graphics.rectangle("fill", self.attack_hitbox.position.x, self.attack_hitbox.position.y, self.attack_hitbox.size:unpack())
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function Player:updateCamera()
@@ -120,33 +168,48 @@ function Player:loadAnim(name, asset_path, frame_width, frame_height, anim_speed
 end
 
 function Player:move(dt, joystick, tilemaps)
+    -- horizontal movement
     input_left = inputs:checkInput(inputs.left, joystick)
     input_right = inputs:checkInput(inputs.right, joystick)
     input_delta = input_right - input_left
+    -- stop player from moving while attacking
+    if self.movement_locked then
+        input_delta = 0.0
+    end
     if (input_delta ~= 0 and lume.sign(input_delta) ~= lume.sign(self.velocity.x) and self.velocity.x ~= 0) or input_delta == 0 then
         self.velocity.x = lume.sign(self.velocity.x) * math.max(0, math.abs(self.velocity.x) - self.friction * dt)
     end
     self.velocity.x = lume.clamp(self.velocity.x + self.acceleration * input_delta * dt, -self.max_speed.x * math.abs(input_delta), self.max_speed.x * math.abs(input_delta))
     
+    -- vertical movement
     local grav = self.gravity
     if self.velocity.y < 0 then
         grav = self.jump_gravity
     end
     self.velocity.y = math.min(self.max_speed.y, self.velocity.y + grav * dt)
-    
     input_jump = inputs:checkInput(inputs.jump, joystick)
+    if self.movement_locked then
+        input_jump = 0.0
+    end
     if input_jump ~= 0 and (self.grounded or self.coyote_timer > 0.0) then
         self.velocity.y = self.jump_speed
         self.coyote_timer = 0.0
     end
-    if #tilemaps == 0 then
-        self.position = self.position + self.velocity * dt
-    else
-        self:check_collision(dt, tilemaps)
-    end
+
+    -- move the character while taking collisions into account
+    self:check_collision(dt, tilemaps)
 end
 
 function Player:check_collision(dt, tilemaps)
+    self:check_collision_x(dt, tilemaps)
+    self:check_collision_y(dt, tilemaps)
+end
+
+function Player:check_collision_x(dt, tilemaps)
+    if #tilemaps == 0 then
+        self.position.x = self.position.x + self.velocity.x * dt
+        return
+    end
     collided = false
     if self.velocity.x ~= 0 then
         rect = {
@@ -191,7 +254,13 @@ function Player:check_collision(dt, tilemaps)
     else
         self.position.x = self.position.x + self.velocity.x * dt
     end
+end
 
+function Player:check_collision_y(dt, tilemaps)
+    if #tilemaps == 0 then
+        self.position.y = self.position.y + self.velocity.y * dt
+        return
+    end
     collided = false
     if self.velocity.y ~= 0 then
         rect = {
@@ -241,4 +310,22 @@ function Player:check_collision(dt, tilemaps)
     else
         self.position.y = self.position.y + self.velocity.y * dt
     end
+end
+
+function Player:update_attack_hitbox()
+    self.attack_hitbox = table.clone(self.attack_frames[self.current_animation][self.animations[self.current_animation]["anim"].position])
+    self.attack_hitbox.position = self.position + self.attack_hitbox.position
+    if not self.facingRight then
+        self.attack_hitbox.position.x = self.attack_hitbox.position.x - self.attack_hitbox.size.x - self.collision_size.x
+    end
+end
+
+function Player:parseInterval(str)
+    if type(str) == "number" then return str,str,1 end
+    str = str:gsub('%s', '') -- remove spaces
+    local min, max = str:match("^(%d+)-(%d+)$")
+    assert(min and max, ("Could not parse interval from %q"):format(str))
+    min, max = tonumber(min), tonumber(max)
+    local step = min <= max and 1 or -1
+    return min, max, step
 end

@@ -1,23 +1,23 @@
 local Inputs = {}
 
 Inputs.left = {
-    keyboard = {"a", "left"},
+    keyboard = {"left"},
     gamepad = {"dpleft"},
     gamepad_axis_negative = {"leftx"},
 }
 
 Inputs.right = {
-    keyboard = {"d", "right"},
+    keyboard = {"right"},
     gamepad = {"dpright"},
     gamepad_axis_positive = {"leftx"},
 }
 
 Inputs.jump = {
-    keyboard = {"space", "up", "w"}
+    keyboard = {"space", "w"}
 }
 
-Inputs.map_editor_select = {
-    mouse = {1}
+Inputs.attack = {
+    keyboard = {"d"}
 }
 
 function Inputs:checkInput(input, joystick)

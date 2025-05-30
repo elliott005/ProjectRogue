@@ -3,24 +3,24 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "maps/src/map_0.tmx",
+    "activeFile": "maps/src/map_2.tmx",
     "expandedProjectPaths": [
-        "tilesets",
         ".",
-        "maps/src",
-        "maps"
+        "maps",
+        "tilesets",
+        "maps/src"
     ],
     "fileStates": {
         "maps/src/map_0.tmx": {
             "expandedObjectLayers": [
-                6,
-                7
+                7,
+                6
             ],
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 333,
-                "y": 257
+                "x": 319,
+                "y": 319
             }
         },
         "maps/src/map_1.tmx": {
@@ -36,15 +36,19 @@
             }
         },
         "maps/src/map_2.tmx": {
+            "expandedObjectLayers": [
+                4,
+                3
+            ],
             "scale": 0.598203125,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 320.12537547342305,
                 "y": 320.125375473423
             }
         },
         "tilesets/Woods.tsx": {
-            "scaleInDock": 0.75,
+            "scaleInDock": 0.5,
             "scaleInEditor": 1
         }
     },
@@ -54,15 +58,17 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 20,
     "openFiles": [
+        "tilesets/Woods.tsx",
         "maps/src/map_0.tmx",
         "maps/src/map_1.tmx",
-        "tilesets/Woods.tsx"
+        "maps/src/map_2.tmx"
     ],
     "project": "ProjectRogue.tiled-project",
     "recentFiles": [
         "tilesets/Woods.tsx",
+        "maps/src/map_0.tmx",
         "maps/src/map_1.tmx",
-        "maps/src/map_0.tmx"
+        "maps/src/map_2.tmx"
     ],
     "tileset.lastUsedFormat": "tsx"
 }
